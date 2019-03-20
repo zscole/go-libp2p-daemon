@@ -1,7 +1,7 @@
 module github.com/libp2p/go-libp2p-daemon
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/apex/log v1.1.0
 	github.com/gogo/protobuf v1.2.1
 	github.com/ipfs/go-cid v0.0.1
 	github.com/ipfs/go-log v0.0.1
@@ -22,6 +22,6 @@ require (
 	github.com/multiformats/go-multiaddr v0.0.1
 	github.com/multiformats/go-multiaddr-net v0.0.1
 	github.com/multiformats/go-multihash v0.0.1
-	github.com/prometheus/client_golang v0.9.2
 	github.com/stretchr/testify v1.3.0
+	go.opencensus.io v0.19.1
 )

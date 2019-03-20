@@ -16,7 +16,6 @@ import (
 	quic "github.com/libp2p/go-libp2p-quic-transport"
 	identify "github.com/libp2p/go-libp2p/p2p/protocol/identify"
 	multiaddr "github.com/multiformats/go-multiaddr"
-	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -51,6 +50,10 @@ func main() {
 	announceAddrs := flag.String("announceAddrs", "", "comma separated list of multiaddrs the host should announce to the network")
 	noListen := flag.Bool("noListenAddrs", false, "sets the host to listen on no addresses")
 	metricsAddr := flag.String("metricsAddr", "", "an address to bind the metrics handler to")
+
+	metricsModulesEnabledHelp := fmt.Sprintf("modules to enable metrics for (comma separated, options: %s)", metricsModuleNames())
+	metricsModulesEnabled := flag.String("metricsModules", "", metricsModulesEnabledHelp)
+
 	flag.Parse()
 
 	var opts []libp2p.Option
@@ -211,9 +214,23 @@ func main() {
 		}
 	}
 
-	if *metricsAddr != "" {
-		http.Handle("/metrics", promhttp.Handler())
-		go func() { log.Println(http.ListenAndServe(*metricsAddr, nil)) }()
+	if *metricsAddr != "" && *metricsModulesEnabled != "" {
+		pe, err := enableMetrics(strings.Split(*metricsModulesEnabled, ","))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		go func() {
+			mux := http.NewServeMux()
+			mux.Handle("/metrics", pe)
+			if err := http.ListenAndServe(*metricsAddr, mux); err != nil {
+				log.Printf("setting up metrics endpoint: %s", err)
+			}
+		}()
+	} else if *metricsAddr != "" {
+		log.Fatal("can't provide -metricsAddr without specifying -metricsModulesEnabled")
+	} else if *metricsModulesEnabled != "" {
+		log.Fatal("can't enable metrics without specifying -metricsAddr")
 	}
 
 	select {}
