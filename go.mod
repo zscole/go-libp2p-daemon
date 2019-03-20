@@ -1,7 +1,6 @@
 module github.com/libp2p/go-libp2p-daemon
 
 require (
-	github.com/apex/log v1.1.0
 	github.com/gogo/protobuf v1.2.1
 	github.com/ipfs/go-cid v0.0.1
 	github.com/ipfs/go-log v0.0.1
