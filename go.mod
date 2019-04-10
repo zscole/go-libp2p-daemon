@@ -22,5 +22,7 @@ require (
 	github.com/multiformats/go-multiaddr-net v0.0.1
 	github.com/multiformats/go-multihash v0.0.1
 	github.com/stretchr/testify v1.3.0
-	go.opencensus.io v0.19.1
+	go.opencensus.io v0.20.0
 )
+
+replace github.com/libp2p/go-libp2p-pubsub => ../go-libp2p-pubsub

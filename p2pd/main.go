@@ -51,9 +51,6 @@ func main() {
 	noListen := flag.Bool("noListenAddrs", false, "sets the host to listen on no addresses")
 	metricsAddr := flag.String("metricsAddr", "", "an address to bind the metrics handler to")
 
-	metricsModulesEnabledHelp := fmt.Sprintf("modules to enable metrics for (comma separated, options: %s)", metricsModuleNames())
-	metricsModulesEnabled := flag.String("metricsModules", "", metricsModulesEnabledHelp)
-
 	flag.Parse()
 
 	var opts []libp2p.Option
@@ -183,6 +180,7 @@ func main() {
 	}
 
 	if *bootstrapPeers != "" {
+		fmt.Println("got boostrap peers", *bootstrapPeers)
 		for _, s := range strings.Split(*bootstrapPeers, ",") {
 			ma, err := multiaddr.NewMultiaddr(s)
 			if err != nil {
@@ -214,8 +212,8 @@ func main() {
 		}
 	}
 
-	if *metricsAddr != "" && *metricsModulesEnabled != "" {
-		pe, err := enableMetrics(strings.Split(*metricsModulesEnabled, ","))
+	if *metricsAddr != "" {
+		pe, err := enableMetrics()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -224,13 +222,9 @@ func main() {
 			mux := http.NewServeMux()
 			mux.Handle("/metrics", pe)
 			if err := http.ListenAndServe(*metricsAddr, mux); err != nil {
-				log.Printf("setting up metrics endpoint: %s", err)
+				log.Printf("setting up metrics endpoint (%s): %s", *metricsAddr, err)
 			}
 		}()
-	} else if *metricsAddr != "" {
-		log.Fatal("can't provide -metricsAddr without specifying -metricsModulesEnabled")
-	} else if *metricsModulesEnabled != "" {
-		log.Fatal("can't enable metrics without specifying -metricsAddr")
 	}
 
 	select {}
