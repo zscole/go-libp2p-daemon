@@ -180,7 +180,6 @@ func main() {
 	}
 
 	if *bootstrapPeers != "" {
-		fmt.Println("got boostrap peers", *bootstrapPeers)
 		for _, s := range strings.Split(*bootstrapPeers, ",") {
 			ma, err := multiaddr.NewMultiaddr(s)
 			if err != nil {
